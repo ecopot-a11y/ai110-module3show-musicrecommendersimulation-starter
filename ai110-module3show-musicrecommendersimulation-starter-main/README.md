@@ -120,6 +120,196 @@ Songs in catalog: 10
 
 The program evaluates each song based on genre matching, mood matching, and energy similarity. It then ranks the songs from highest to lowest score and returns the top five recommendations.
 
+## System Evaluation: Diverse User Profiles
+
+To evaluate the music recommendation system, I tested five different user profiles. Three profiles represent typical musical preferences, while two adversarial profiles test the algorithm's behavior when preferences are conflicting or unavailable in the catalog.
+
+### Test 1: High-Energy Pop
+
+This profile represents a listener who prefers happy pop music with high energy.
+
+```text
+====================================================
+PROFILE: High-Energy Pop
+====================================================
+Favorite genre: pop
+Favorite mood: happy
+Target energy: 0.90
+
+TOP 5 RECOMMENDATIONS
+----------------------------------------------------
+
+1. Sunrise City
+   Final Score: 3.92 / 4.00
+   Reasons: genre match (+2.0), mood match (+1.0), energy similarity (+0.92)
+
+2. Gym Hero
+   Final Score: 2.97 / 4.00
+   Reasons: genre match (+2.0), energy similarity (+0.97)
+
+3. Rooftop Lights
+   Final Score: 1.86 / 4.00
+   Reasons: mood match (+1.0), energy similarity (+0.86)
+
+4. Storm Runner
+   Final Score: 0.99 / 4.00
+   Reasons: energy similarity (+0.99)
+
+5. Night Drive Loop
+   Final Score: 0.85 / 4.00
+   Reasons: energy similarity (+0.85)
+```
+
+### Test 2: Chill Lofi
+
+This profile represents a listener who prefers relaxing lofi music with low energy.
+
+```text
+====================================================
+PROFILE: Chill Lofi
+====================================================
+Favorite genre: lofi
+Favorite mood: chill
+Target energy: 0.35
+
+TOP 5 RECOMMENDATIONS
+----------------------------------------------------
+
+1. Library Rain
+   Final Score: 4.00 / 4.00
+   Reasons: genre match (+2.0), mood match (+1.0), energy similarity (+1.00)
+
+2. Midnight Coding
+   Final Score: 3.93 / 4.00
+   Reasons: genre match (+2.0), mood match (+1.0), energy similarity (+0.93)
+
+3. Focus Flow
+   Final Score: 2.95 / 4.00
+   Reasons: genre match (+2.0), energy similarity (+0.95)
+
+4. Spacewalk Thoughts
+   Final Score: 1.93 / 4.00
+   Reasons: mood match (+1.0), energy similarity (+0.93)
+
+5. Coffee Shop Stories
+   Final Score: 0.98 / 4.00
+   Reasons: energy similarity (+0.98)
+```
+
+### Test 3: Deep Intense Rock
+
+This profile represents a listener who prefers intense rock music with very high energy.
+
+```text
+====================================================
+PROFILE: Deep Intense Rock
+====================================================
+Favorite genre: rock
+Favorite mood: intense
+Target energy: 0.95
+
+TOP 5 RECOMMENDATIONS
+----------------------------------------------------
+
+1. Storm Runner
+   Final Score: 3.96 / 4.00
+   Reasons: genre match (+2.0), mood match (+1.0), energy similarity (+0.96)
+
+2. Gym Hero
+   Final Score: 1.98 / 4.00
+   Reasons: mood match (+1.0), energy similarity (+0.98)
+
+3. Sunrise City
+   Final Score: 0.87 / 4.00
+   Reasons: energy similarity (+0.87)
+
+4. Rooftop Lights
+   Final Score: 0.81 / 4.00
+   Reasons: energy similarity (+0.81)
+
+5. Night Drive Loop
+   Final Score: 0.80 / 4.00
+   Reasons: energy similarity (+0.80)
+```
+
+### Test 4: Conflicting Preferences (Adversarial)
+
+This profile requests sad pop music with very high energy. It tests whether the algorithm can accommodate unusual combinations of preferences.
+
+```text
+====================================================
+PROFILE: Conflicting Preferences
+====================================================
+Favorite genre: pop
+Favorite mood: sad
+Target energy: 0.90
+
+TOP 5 RECOMMENDATIONS
+----------------------------------------------------
+
+1. Gym Hero
+   Final Score: 2.97 / 4.00
+   Reasons: genre match (+2.0), energy similarity (+0.97)
+
+2. Sunrise City
+   Final Score: 2.92 / 4.00
+   Reasons: genre match (+2.0), energy similarity (+0.92)
+
+3. Storm Runner
+   Final Score: 0.99 / 4.00
+   Reasons: energy similarity (+0.99)
+
+4. Rooftop Lights
+   Final Score: 0.86 / 4.00
+   Reasons: energy similarity (+0.86)
+
+5. Night Drive Loop
+   Final Score: 0.85 / 4.00
+   Reasons: energy similarity (+0.85)
+```
+
+### Test 5: Unfamiliar Genre (Adversarial)
+
+This profile requests classical music with a mysterious mood. It tests how the system behaves when the requested categories are missing from the catalog.
+
+```text
+====================================================
+PROFILE: Unfamiliar Genre
+====================================================
+Favorite genre: classical
+Favorite mood: mysterious
+Target energy: 0.50
+
+TOP 5 RECOMMENDATIONS
+----------------------------------------------------
+
+1. Midnight Coding
+   Final Score: 0.92 / 4.00
+   Reasons: energy similarity (+0.92)
+
+2. Focus Flow
+   Final Score: 0.90 / 4.00
+   Reasons: energy similarity (+0.90)
+
+3. Coffee Shop Stories
+   Final Score: 0.87 / 4.00
+   Reasons: energy similarity (+0.87)
+
+4. Library Rain
+   Final Score: 0.85 / 4.00
+   Reasons: energy similarity (+0.85)
+
+5. Spacewalk Thoughts
+   Final Score: 0.78 / 4.00
+   Reasons: energy similarity (+0.78)
+```
+
+### Initial Evaluation Questions
+
+The evaluation focuses on whether genre and mood matches dominate the rankings, how energy similarity affects the results, and whether the system can make meaningful recommendations when user preferences conflict with the available songs.
+
+The results will help identify strengths, weaknesses, and opportunities to improve the recommendation algorithm.
+
 ### Terminal Output
 
 Run the application using:
@@ -167,11 +357,10 @@ TOP 5 RECOMMENDATIONS
 
 ## Experiments You Tried
 
-I tested the recommendation algorithm using a user who prefers rock music, an intense mood, and an energy level of 0.90. The song "Storm Runner" received a score of 3.99 because it matched the preferred genre and mood and had nearly identical energy. In comparison, "Midnight Coding" received a score of 0.52 because it did not match the preferred genre or mood.
+```I tested the recommendation algorithm using a user who prefers rock music, an intense mood, and an energy level of 0.90. The song "Storm Runner" received a score of 3.99 because it matched the preferred genre and mood and had nearly identical energy. In comparison, "Midnight Coding" received a score of 0.52 because it did not match the preferred genre or mood.
 
 I also tested the ranking function by placing a lower-scoring song before a higher-scoring song in the input list. The recommender correctly selected the higher-scoring song. All three automated tests passed.
-
----
+```
 
 ## Limitations and Risks
 
