@@ -61,14 +61,7 @@ Prompts:
 
 ## 6. Limitations and Bias 
 
-Where the system struggles or behaves unfairly. 
-
-Prompts:  
-
-- Features it does not consider  
-- Genres or moods that are underrepresented  
-- Cases where the system overfits to one preference  
-- Ways the scoring might unintentionally favor some users  
+The recommendation system has limitations because it relies on a small catalog of 10 songs and uses exact matching for genre and mood. The original scoring algorithm assigns twice as much weight to genre as mood, which may create a filter bubble by repeatedly recommending songs from a listener's preferred genre. During my evaluation, the Unfamiliar Genre profile requested classical music with a mysterious mood, but the system recommended Midnight Coding with a score of only 0.92 because its energy was similar to the user's target. This demonstrates that the algorithm can recommend songs even when neither genre nor mood matches the listener's preferences. Future improvements could include expanding the song catalog, adjusting scoring weights, and introducing a minimum score threshold to prevent weak recommendations. 
 
 ---
 

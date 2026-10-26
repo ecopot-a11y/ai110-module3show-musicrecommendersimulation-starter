@@ -106,8 +106,6 @@ You can add more tests in `tests/test_recommender.py`.
 
 ## Sample Recommendation Output
 
-Paste a sample of your recommender's output here as a text block so a reader can see what it produces:
-
 The music recommendation system was tested using the default listener profile:
 
 Favorite genre: pop
@@ -304,11 +302,47 @@ TOP 5 RECOMMENDATIONS
    Reasons: energy similarity (+0.78)
 ```
 
-### Initial Evaluation Questions
+### Evaluation Findings
 
-The evaluation focuses on whether genre and mood matches dominate the rankings, how energy similarity affects the results, and whether the system can make meaningful recommendations when user preferences conflict with the available songs.
+I tested my music recommendation system using five different user profiles, including three normal profiles and two adversarial profiles. The purpose was to determine whether the algorithm produced reasonable recommendations and identify weaknesses in its scoring logic.
 
-The results will help identify strengths, weaknesses, and opportunities to improve the recommendation algorithm.
+**Results from Normal Profiles**
+
+The three normal profiles produced recommendations that closely matched the requested musical preferences.
+
+For High-Energy Pop, "Sunrise City" ranked first with a score of 3.92 out of 4.00 because it matched the preferred genre and mood and had similar energy.
+
+For Chill Lofi, "Library Rain" received a perfect score of 4.00 because it matched all three preferences.
+
+For Deep Intense Rock, "Storm Runner" ranked first with 3.96, demonstrating that the algorithm correctly prioritizes songs matching the requested genre and mood.
+
+**Results from Adversarial Profiles**
+
+The Conflicting Preferences profile requested sad pop music with high energy. However, "Gym Hero" ranked first with 2.97 even though its mood did not match. This demonstrates how the algorithm's genre weight can dominate the recommendation results.
+
+The Unfamiliar Genre profile requested classical music with a mysterious mood. None of the recommendations matched either category. The highest-scoring song, "Midnight Coding," received only 0.92 points based entirely on energy similarity.
+
+**Strengths**
+
+- The scoring system is transparent and provides understandable explanations.
+- Songs matching genre, mood, and energy consistently receive high scores.
+- The ranking function correctly orders songs from highest to lowest score.
+- The recommender handles unusual user profiles without crashing.
+
+**Weaknesses**
+
+- Genre receives twice the weight of mood, potentially overemphasizing genre.
+- Exact matching does not recognize relationships between similar genres or moods.
+- The recommender returns five songs even when none are strong matches.
+- The small 10-song catalog limits recommendation variety.
+
+**Potential Improvements**
+
+Future improvements could include allowing users to adjust the importance of genre, mood, and energy, expanding the catalog, introducing a minimum recommendation score, and using additional song attributes such as tempo, danceability, and acousticness.
+
+**Conclusion**
+
+Overall, the system performs well when the song catalog contains music matching the user's preferences. However, the adversarial tests demonstrate that producing a ranked list does not necessarily mean the recommendations are appropriate. Recommendation quality depends on the scoring weights, the available songs, and how well the algorithm handles preferences that cannot be satisfied.
 
 ### Terminal Output
 
