@@ -94,7 +94,7 @@ def test_recommend_songs_ranks_highest_score_first():
     # Verify that the highest-scoring song is selected
     assert results[0][0]["title"] == "Rock Track"
 
-    # Verify the numeric score: 2 + 1 + 0.99 = 3.99
+    # Original weights: 2 + 1 + 0.99 = 3.99
     assert abs(results[0][1] - 3.99) < 0.0001
 
     # Verify that an explanation is included

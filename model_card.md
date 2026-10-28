@@ -1,104 +1,109 @@
-# 🎧 Model Card: Music Recommender Simulation
+# 🎧 Model Card: VibeFinder 1.0
 
-## 1. Model Name  
+## 1. Model Name
 
-Give your model a short, descriptive name.  
-Example: **VibeFinder 1.0**  
+**VibeFinder 1.0 — Music Recommender Simulation**
 
----
+## 2. Goal / Task and Intended Use
 
-## 2. Intended Use  
+VibeFinder suggests five songs based on a listener's favorite genre, preferred mood, and target energy level. It is a classroom demonstration of a simple content-based recommendation system, not a trained machine-learning model. It is intended for learning, testing scoring rules, and explaining why songs are ranked. It should not be used to predict a person's real musical taste, make commercial playlist decisions, or evaluate people. It assumes the listener can describe their preferences using the available categories.
 
-Describe what your recommender is designed to do and who it is for. 
+## 3. How the Model Works
 
-Prompts:  
+The system reads a song catalog and compares each song with the listener's preferences. A matching genre earns **2 points**. A matching mood earns **1 point**. A song can earn **up to 1 point** when its energy is close to the requested level. The highest possible score is **4 points**. The system sorts songs by score and shows the top five with short explanations. It does not learn from listening history or feedback.
 
-- What kind of recommendations does it generate  
-- What assumptions does it make about the user  
-- Is this for real users or classroom exploration  
+## 4. Data Used
 
----
+The catalog has **10 songs** in `data/songs.csv`. Each record includes an ID, title, artist, genre, mood, energy, tempo, valence, danceability, and acousticness. The current scoring rule uses only genre, mood, and energy. The catalog has **three lofi songs, two pop songs, and one each** in rock, ambient, jazz, synthwave, and indie pop. It does not include classical music, and it cannot cover every listening preference. No new songs were needed for the evaluation; I changed user profiles and tested a temporary scoring adjustment.
 
-## 3. How the Model Works  
+## 5. Strengths
 
-Explain your scoring approach in simple language.  
+The system gives understandable results when matching songs are available. **Library Rain** scored **4.00** for the Chill Lofi profile because genre, mood, and energy all matched. **Storm Runner** scored **3.96** for Deep Intense Rock. Each recommendation includes a score explanation, making the ranking easy to inspect.
 
-Prompts:  
+## 6. Limitations and Bias
 
-- What features of each song are used (genre, energy, mood, etc.)  
-- What user preferences are considered  
-- How does the model turn those into a score  
-- What changes did you make from the starter logic  
+The catalog is small, so some genres have more choices than others. Genre earns twice as many points as mood, which can repeatedly favor songs from the listener's preferred genre and limit variety. For the Unfamiliar Genre profile, the system recommended **Midnight Coding** with only **0.92** points because no song matched the requested classical genre or mysterious mood. The system still returns five songs even when none is a strong match. A larger catalog, adjustable weights, and a minimum match threshold could help.
 
-Avoid code here. Pretend you are explaining the idea to a friend who does not program.
+## 7. Evaluation
 
----
+### User Profiles Tested
 
-## 4. Data  
+I evaluated my music recommendation system using five different listener profiles to determine how changing genre, mood, and energy preferences affects the recommendations.
 
-Describe the dataset the model uses.  
+| User Profile | Genre | Mood | Energy | Top Recommendation | Score |
+|---|---|---|---|---|---|
+| High-Energy Pop | pop | happy | 0.90 | Sunrise City | 3.92 |
+| Chill Lofi | lofi | chill | 0.35 | Library Rain | 4.00 |
+| Deep Intense Rock | rock | intense | 0.95 | Storm Runner | 3.96 |
+| Conflicting Preferences | pop | sad | 0.90 | Gym Hero | 2.97 |
+| Unfamiliar Genre | classical | mysterious | 0.50 | Midnight Coding | 0.92 |
 
-Prompts:  
+### Comparing the User Profiles
 
-- How many songs are in the catalog  
-- What genres or moods are represented  
-- Did you add or remove data  
-- Are there parts of musical taste missing in the dataset  
+**Comparison 1: High-Energy Pop vs. Chill Lofi**
 
----
+High-Energy Pop recommended "Sunrise City" first because it matches the pop genre, happy mood, and high-energy preference. Chill Lofi recommended "Library Rain" first because it matches the lofi genre, chill mood, and lower energy preference. This makes sense because someone looking for upbeat pop music would likely want a different listening experience from someone looking for relaxing study music.
 
-## 5. Strengths  
+**Comparison 2: High-Energy Pop vs. Deep Intense Rock**
 
-Where does your system seem to work well  
+High-Energy Pop ranked "Sunrise City" first with 3.92, while Deep Intense Rock ranked "Storm Runner" first with 3.96. Both users requested energetic music, but their genre and mood preferences were different. This demonstrates that the recommender considers more than energy alone when choosing songs.
 
-Prompts:  
+**Comparison 3: Chill Lofi vs. Deep Intense Rock**
 
-- User types for which it gives reasonable results  
-- Any patterns you think your scoring captures correctly  
-- Cases where the recommendations matched your intuition  
+Chill Lofi produced a perfect match with "Library Rain," scoring 4.00. Deep Intense Rock recommended "Storm Runner" with 3.96. The recommendations changed because the first profile preferred calm, low-energy music while the second preferred intense, high-energy rock. The catalog also contains three lofi songs but only one rock song, giving the lofi listener more genre-matching options.
 
----
+**Comparison 4: High-Energy Pop vs. Conflicting Preferences**
 
-## 6. Limitations and Bias 
+Both profiles requested pop music with a target energy of 0.90, but High-Energy Pop requested a happy mood while Conflicting Preferences requested a sad mood. "Sunrise City" ranked first for High-Energy Pop because it matched both genre and mood. "Gym Hero" ranked first for Conflicting Preferences because it matched the pop genre and had slightly closer energy, even though it did not match the requested sad mood. This demonstrates how changing just one preference can affect the rankings.
 
-The recommendation system has limitations because it relies on a small catalog of 10 songs and uses exact matching for genre and mood. The original scoring algorithm assigns twice as much weight to genre as mood, which may create a filter bubble by repeatedly recommending songs from a listener's preferred genre. During my evaluation, the Unfamiliar Genre profile requested classical music with a mysterious mood, but the system recommended Midnight Coding with a score of only 0.92 because its energy was similar to the user's target. This demonstrates that the algorithm can recommend songs even when neither genre nor mood matches the listener's preferences. Future improvements could include expanding the song catalog, adjusting scoring weights, and introducing a minimum score threshold to prevent weak recommendations. 
+**Comparison 5: Conflicting Preferences vs. Unfamiliar Genre**
 
----
+Conflicting Preferences ranked "Gym Hero" first with 2.97 because its pop genre matched the listener's preference. Unfamiliar Genre ranked "Midnight Coding" first with only 0.92 because none of the songs matched the requested classical genre or mysterious mood. This demonstrates that the system can still rank songs even when it cannot find a strong match.
 
-## 7. Evaluation  
+### Surprising Results
 
-How you checked whether the recommender behaved as expected. 
+One surprising result was that "Gym Hero" appeared near the top of several recommendation lists, even though it has an intense mood rather than a happy mood.
 
-Prompts:  
+For example, "Gym Hero" ranked second for High-Energy Pop because it matched the pop genre and had energy close to 0.90. Its genre match contributed 2.0 points, while energy similarity contributed 0.97 points. This gave it a total score of 2.97 despite not matching the requested happy mood.
 
-- Which user profiles you tested  
-- What you looked for in the recommendations  
-- What surprised you  
-- Any simple tests or comparisons you ran  
+Another surprising result occurred with the Unfamiliar Genre profile. The system returned five recommendations even though none matched the requested genre or mood. The highest score was only 0.92.
 
-No need for numeric metrics unless you created some.
+### Accuracy and Limitations
 
----
+The results generally made sense for the three normal profiles. The highest-ranked songs matched the requested genre and mood and had energy levels close to the listener's target.
 
-## 8. Future Work  
+However, the adversarial profiles revealed that a high ranking does not necessarily mean a song is appropriate. The algorithm gives genre twice the weight of mood, which can favor songs with the correct genre but an unsuitable mood.
 
-Ideas for how you would improve the model next.  
+The dataset also limits variety. There are three lofi songs but only one rock song, meaning some listeners have more matching options than others.
 
-Prompts:  
+### Evaluation Conclusion
 
-- Additional features or preferences  
-- Better ways to explain recommendations  
-- Improving diversity among the top results  
-- Handling more complex user tastes  
+Overall, the recommender successfully changes its rankings based on user preferences and provides understandable explanations for its decisions.
 
----
+The experiments showed that the system works best when the catalog contains songs matching the listener's preferred genre, mood, and energy. When those matches are unavailable, it still returns recommendations, but their quality may be poor.
 
-## 9. Personal Reflection  
+Future improvements could include expanding the catalog, allowing users to adjust scoring weights, and introducing a minimum score threshold so the system can warn users when no strong recommendations are available.
 
-A few sentences about your experience.  
+### Weight Shift Experiment (Step 3)
 
-Prompts:  
+I temporarily reduced the genre weight from **2 to 1** and increased the maximum energy weight from **1 to 2**. Mood stayed at **1**, so the maximum total remained **4**. I reran all five profiles and compared the results with the original formula.
 
-- What you learned about recommender systems  
-- Something unexpected or interesting you discovered  
-- How this changed the way you think about music recommendation apps  
+| Profile | First-place song | Original score | Experimental score |
+|---|---|---:|---:|
+| High-Energy Pop | Sunrise City | 3.92 | 3.84 |
+| Chill Lofi | Library Rain | 4.00 | 4.00 |
+| Deep Intense Rock | Storm Runner | 3.96 | 3.92 |
+| Conflicting Preferences | Gym Hero | 2.97 | 2.94 |
+| Unfamiliar Genre | Midnight Coding | 0.92 | 1.84 |
+
+The top-five order did not change for any profile, although scores changed. The biggest surprise was **Midnight Coding**, whose score doubled for the Unfamiliar Genre profile even though its genre and mood still did not match. This shows that a higher score does not always mean a better recommendation. I restored the original scoring weights after the experiment. The experiment did not show a clear improvement in recommendation quality.
+
+## 8. Ideas for Improvement
+
+1. Add more songs and more genres so different listeners have better choices.
+2. Let listeners adjust how important genre, mood, and energy are to them.
+3. Warn the listener when all scores are low instead of presenting weak matches as strong recommendations.
+
+## 9. Personal Reflection
+
+I learned that a recommendation system can be easy to explain but still make questionable suggestions. I was surprised that changing the weights changed scores without changing the rankings. The experiment helped me see why data variety and careful evaluation matter as much as the formula itself.

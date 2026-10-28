@@ -85,11 +85,19 @@ Paste a sample of your recommender's output here as a text block so a reader can
 
 ## Experiments You Tried
 
-Use this section to document the experiments you ran. For example:
+I conducted a weight shift experiment to determine how sensitive my recommendation system was to changes in the scoring algorithm.
 
-- What happened when you changed the weight on genre from 2.0 to 0.5
-- What happened when you added tempo or valence to the score
-- How did your system behave for different types of users
+In the original formula, genre contributed 2 points, mood contributed 1 point, and energy similarity contributed up to 1 point. For the experiment, I reduced the genre weight to 1 point and doubled the energy weight to 2 points. Mood remained at 1 point, and the maximum possible score remained 4.00.
+
+After running the same five user profiles, I discovered that the first-place recommendations and top-five ranking orders did not change. However, their numerical scores changed.
+
+For example, Sunrise City decreased from 3.92 to 3.84 for High-Energy Pop, while Library Rain remained at a perfect 4.00 for Chill Lofi. Gym Hero remained the top recommendation for Conflicting Preferences, decreasing slightly from 2.97 to 2.94.
+
+The most surprising result occurred with the Unfamiliar Genre profile. Midnight Coding's score increased from 0.92 to 1.84 even though it still did not match the requested classical genre or mysterious mood. Its score increased simply because energy similarity received more weight.
+
+This experiment demonstrated that changing scoring weights can make recommendations look stronger or weaker numerically without necessarily improving their relevance. Although the scores changed, the recommendations remained in the same order for all five profiles.
+
+I concluded that the experimental weight shift did not demonstrate a clear improvement in recommendation accuracy. A larger and more diverse song catalog, along with actual listener feedback, would be needed to determine whether the new weights are more effective.
 
 ---
 

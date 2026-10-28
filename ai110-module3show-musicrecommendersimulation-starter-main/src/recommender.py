@@ -68,6 +68,8 @@ def load_songs(csv_path: str) -> List[Dict]:
 
     return songs
 
+
+
 def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
     """
     Score one song based on genre, mood, and energy similarity.
@@ -84,9 +86,11 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
     favorite_genre = user_prefs.get(
         "favorite_genre", user_prefs.get("genre", "")
     )
+
     favorite_mood = user_prefs.get(
         "favorite_mood", user_prefs.get("mood", "")
     )
+
     target_energy = float(
         user_prefs.get("target_energy", user_prefs.get("energy", 0.5))
     )
@@ -112,7 +116,6 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
     reasons.append(f"energy similarity (+{energy_points:.2f})")
 
     return score, reasons
-
 
 def recommend_songs(
     user_prefs: Dict,
