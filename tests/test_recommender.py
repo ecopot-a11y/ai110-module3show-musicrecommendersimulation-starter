@@ -1,4 +1,4 @@
-from src.recommender import Song, UserProfile, Recommender
+from src.recommender import Song, UserProfile, Recommender, recommend_songs
 
 def make_small_recommender() -> Recommender:
     songs = [
@@ -59,3 +59,43 @@ def test_explain_recommendation_returns_non_empty_string():
     explanation = rec.explain_recommendation(user, song)
     assert isinstance(explanation, str)
     assert explanation.strip() != ""
+
+
+def test_recommend_songs_ranks_highest_score_first():
+    # Create a sample user profile
+    user = {
+        "favorite_genre": "rock",
+        "favorite_mood": "intense",
+        "target_energy": 0.90
+    }
+
+    # Put the lower-scoring song FIRST to test sorting
+    songs = [
+        {
+            "title": "Chill Track",
+            "genre": "lofi",
+            "mood": "chill",
+            "energy": 0.40
+        },
+        {
+            "title": "Rock Track",
+            "genre": "rock",
+            "mood": "intense",
+            "energy": 0.91
+        }
+    ]
+
+    # Request only the highest-scoring song
+    results = recommend_songs(user, songs, k=1)
+
+    # Verify that only one recommendation is returned
+    assert len(results) == 1
+
+    # Verify that the highest-scoring song is selected
+    assert results[0][0]["title"] == "Rock Track"
+
+    # Original weights: 2 + 1 + 0.99 = 3.99
+    assert abs(results[0][1] - 3.99) < 0.0001
+
+    # Verify that an explanation is included
+    assert "genre match" in results[0][2]

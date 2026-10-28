@@ -45,29 +45,99 @@ class Recommender:
         # TODO: Implement explanation logic
         return "Explanation placeholder"
 
+
 def load_songs(csv_path: str) -> List[Dict]:
-    """
-    Loads songs from a CSV file.
-    Required by src/main.py
-    """
-    # TODO: Implement CSV loading logic
-    print(f"Loading songs from {csv_path}...")
-    return []
+    """Load songs from a CSV file and convert numeric fields."""
+
+    import csv
+
+    songs = []
+
+    with open(csv_path, mode="r", newline="", encoding="utf-8-sig") as file:
+        reader = csv.DictReader(file)
+
+        for row in reader:
+            row["id"] = int(row["id"])
+            row["energy"] = float(row["energy"])
+            row["tempo_bpm"] = float(row["tempo_bpm"])
+            row["valence"] = float(row["valence"])
+            row["danceability"] = float(row["danceability"])
+            row["acousticness"] = float(row["acousticness"])
+
+            songs.append(row)
+
+    return songs
+
+
 
 def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
     """
-    Scores a single song against user preferences.
-    Required by recommend_songs() and src/main.py
-    """
-    # TODO: Implement scoring logic using your Algorithm Recipe from Phase 2.
-    # Expected return format: (score, reasons)
-    return []
+    Score one song based on genre, mood, and energy similarity.
 
-def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Tuple[Dict, float, str]]:
+    Returns:
+        (total_score, reasons)
     """
-    Functional implementation of the recommendation logic.
-    Required by src/main.py
-    """
-    # TODO: Implement scoring and ranking logic
-    # Expected return format: (song_dict, score, explanation)
-    return []
+
+    score = 0.0
+    reasons = []
+
+    # Get the user's preferences.
+    # Support both the Phase 2 profile and the starter main.py profile.
+    favorite_genre = user_prefs.get(
+        "favorite_genre", user_prefs.get("genre", "")
+    )
+
+    favorite_mood = user_prefs.get(
+        "favorite_mood", user_prefs.get("mood", "")
+    )
+
+    target_energy = float(
+        user_prefs.get("target_energy", user_prefs.get("energy", 0.5))
+    )
+
+    # Rule 1: Genre match (+2.0)
+    if song["genre"].lower() == favorite_genre.lower():
+        score += 2.0
+        reasons.append("genre match (+2.0)")
+
+    # Rule 2: Mood match (+1.0)
+    if song["mood"].lower() == favorite_mood.lower():
+        score += 1.0
+        reasons.append("mood match (+1.0)")
+
+    # Rule 3: Energy similarity (up to +1.0)
+    song_energy = float(song["energy"])
+
+    energy_points = max(
+        0.0, 1.0 - abs(song_energy - target_energy)
+    )
+
+    score += energy_points
+    reasons.append(f"energy similarity (+{energy_points:.2f})")
+
+    return score, reasons
+
+def recommend_songs(
+    user_prefs: Dict,
+    songs: List[Dict],
+    k: int = 5
+) -> List[Tuple[Dict, float, str]]:
+    """Rank songs by preference score and return the top k with explanations."""
+    
+    scored_songs = []
+
+    for song in songs:
+        score, reasons = score_song(user_prefs, song)
+
+        scored_songs.append(
+            (song, score, ", ".join(reasons))
+        )
+
+    ranked_songs = sorted(
+        scored_songs,
+        key=lambda item: item[1],
+        reverse=True
+    )
+
+    return ranked_songs[:max(0, k)]
+
