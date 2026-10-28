@@ -17,6 +17,12 @@ class Song:
     valence: float
     danceability: float
     acousticness: float
+    popularity: int = 50
+    release_decade: int = 2020
+    detailed_mood_tags: str = ""
+    instrumentalness: float = 0.0
+    is_live: bool = False
+    listening_context: str = ""
 
 @dataclass
 class UserProfile:
@@ -38,12 +44,12 @@ class Recommender:
         self.songs = songs
 
     def recommend(self, user: UserProfile, k: int = 5) -> List[Song]:
-        # TODO: Implement recommendation logic
-        return self.songs[:k]
+        prefs = vars(user).copy()
+        return sorted(self.songs, key=lambda song: score_song(prefs, vars(song))[0], reverse=True)[:max(0, k)]
 
     def explain_recommendation(self, user: UserProfile, song: Song) -> str:
-        # TODO: Implement explanation logic
-        return "Explanation placeholder"
+        _, reasons = score_song(vars(user), vars(song))
+        return ", ".join(reasons)
 
 
 def load_songs(csv_path: str) -> List[Dict]:
@@ -64,11 +70,16 @@ def load_songs(csv_path: str) -> List[Dict]:
             row["danceability"] = float(row["danceability"])
             row["acousticness"] = float(row["acousticness"])
 
+            # Advanced fields are optional for compatibility with older CSV files.
+            row["popularity"] = int(row.get("popularity") or 50)
+            row["release_decade"] = int(row.get("release_decade") or 2020)
+            row["instrumentalness"] = float(row.get("instrumentalness") or 0)
+            row["is_live"] = str(row.get("is_live", "no")).lower() in ("yes", "true", "1")
+            row["detailed_mood_tags"] = row.get("detailed_mood_tags", "")
+            row["listening_context"] = row.get("listening_context", "")
             songs.append(row)
 
     return songs
-
-
 
 def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
     """
@@ -86,11 +97,9 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
     favorite_genre = user_prefs.get(
         "favorite_genre", user_prefs.get("genre", "")
     )
-
     favorite_mood = user_prefs.get(
         "favorite_mood", user_prefs.get("mood", "")
     )
-
     target_energy = float(
         user_prefs.get("target_energy", user_prefs.get("energy", 0.5))
     )
@@ -115,7 +124,47 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
     score += energy_points
     reasons.append(f"energy similarity (+{energy_points:.2f})")
 
+    # Optional advanced preferences: each is independently scored.
+    # Without these preferences, the original 0–4 score is unchanged.
+    if user_prefs.get("target_popularity") is not None:
+        target = max(0, min(100, float(user_prefs["target_popularity"])))
+        points = max(0.0, 0.5 * (1 - abs(float(song.get("popularity", 50)) - target) / 100))
+        score += points
+        reasons.append(f"popularity similarity (+{points:.2f})")
+
+    if user_prefs.get("preferred_decade") is not None:
+        if int(song.get("release_decade", 2020)) == int(user_prefs["preferred_decade"]):
+            score += 0.5
+            reasons.append("release decade match (+0.50)")
+
+    if user_prefs.get("detailed_mood_tag"):
+        tags = {tag.strip().lower() for tag in str(song.get("detailed_mood_tags", "")).split("|")}
+        if str(user_prefs["detailed_mood_tag"]).strip().lower() in tags:
+            score += 0.5
+            reasons.append("detailed mood match (+0.50)")
+
+    if user_prefs.get("target_instrumentalness") is not None:
+        target = max(0.0, min(1.0, float(user_prefs["target_instrumentalness"])))
+        actual = float(song.get("instrumentalness", 0))
+        points = max(0.0, 0.5 * (1 - abs(actual - target)))
+        score += points
+        reasons.append(f"instrumentalness similarity (+{points:.2f})")
+
+    if user_prefs.get("prefers_live") is not None:
+        live = song.get("is_live", False)
+        if isinstance(live, str):
+            live = live.strip().lower() in ("yes", "true", "1")
+        if bool(live) == bool(user_prefs["prefers_live"]):
+            score += 0.5
+            reasons.append("live recording preference match (+0.50)")
+
+    if user_prefs.get("listening_context"):
+        if str(song.get("listening_context", "")).lower() == str(user_prefs["listening_context"]).lower():
+            score += 0.5
+            reasons.append("listening context match (+0.50)")
+
     return score, reasons
+
 
 def recommend_songs(
     user_prefs: Dict,
